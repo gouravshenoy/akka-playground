@@ -32,8 +32,11 @@ public class HelloAkkaJava {
         String greeting = "";
 
         public void onReceive(Object message) {
-            if (message instanceof WhoToGreet)
+            System.out.println("Greeter | Sender: " + getSender());
+
+            if (message instanceof WhoToGreet) {
                 greeting = "hello, " + ((WhoToGreet) message).who;
+            }
 
             else if (message instanceof Greet || message instanceof Bakri)
                 // Send the current greeting back to the sender
@@ -71,12 +74,13 @@ public class HelloAkkaJava {
         System.out.println("Greeting: " + greeting2.message);
 
         // after zero seconds, send a Greet message every second to the greeter with a sender of the GreetPrinter
-        ActorRef greetPrinter = system.actorOf(Props.create(GreetPrinter.class));
+        ActorRef greetPrinter = system.actorOf(Props.create(GreetPrinter.class), "greet-printer");
         system.scheduler().schedule(Duration.Zero(), Duration.create(1, TimeUnit.SECONDS), greeter, new Greet(), system.dispatcher(), greetPrinter);
     }
 
     public static class GreetPrinter extends UntypedActor {
         public void onReceive(Object message) {
+            System.out.println("GreetPrinter | sender: " + getSender());
             if (message instanceof Greeting)
                 System.out.println(((Greeting) message).message);
 
